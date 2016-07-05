@@ -38,6 +38,7 @@ import           GHC.Generics
 
 import           Data.Aeson
 import           Data.Bool           (bool)
+import qualified Data.HashMap.Strict as HM
 import           Data.String         (fromString)
 import           Data.Text
 import           Data.Time
@@ -100,6 +101,11 @@ data Repository = Repository
     , repositoryDefaultBranch :: Maybe Text
     , repositoryPrivate       :: Bool
     , repositoryPermissions   :: Maybe Permission
+    , repositoryLanguage      :: Maybe Text
+    , repositoryStargazers    :: Int
+    , repositoryPushed        :: Maybe UTCTime
+    , repositoryCreated       :: Maybe UTCTime
+    , repositoryUpdated       :: Maybe UTCTime
     } deriving (Eq, Show)
 -- | repositories are identified by their name
 type RepositoryName = Text
@@ -120,12 +126,31 @@ instance ToJSON Permission where
 
 instance FromJSON Repository where
   parseJSON (Object o) =
-   Repository <$> o .: "full_name"
+   Repository <$> o .:  "full_name"
               <*> o .:? "description"
               <*> o .:? "default_branch"
-              <*> o .: "private"
+              <*> o .:  "private"
               <*> o .:? "permissions"
+              <*> o .:? "language"
+              <*> o .:  "stargazers_count"
+              <*> o .:  "pushed_at"
+              <*> o .:  "created_at"
+              <*> o .:  "updated_at"
   parseJSON _ = mzero
+
+instance ToJSON Repository where
+  toJSON r =
+    object [ "name"           .= repositoryName          r
+           , "description"    .= repositoryDescription   r
+           , "default_branch" .= repositoryDefaultBranch r
+           , "private"        .= repositoryPrivate       r
+           , "permissions"    .= repositoryPermissions   r
+           , "language"       .= repositoryLanguage      r
+           , "stargazers"     .= repositoryStargazers    r
+           , "pushed"         .= repositoryPushed        r
+           , "created"        .= repositoryCreated       r
+           , "updated"        .= repositoryUpdated       r
+           ]
 
 -- | Star
 data Star = Star
