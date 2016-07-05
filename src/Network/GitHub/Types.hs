@@ -37,6 +37,8 @@ import           Control.Monad
 import           GHC.Generics
 
 import           Data.Aeson
+import           Data.Bool           (bool)
+import           Data.String         (fromString)
 import           Data.Text
 import           Data.Time
 
@@ -111,10 +113,10 @@ instance FromJSON Permission where
   parseJSON (Object o) = do
     admin <- o .: "admin"
     push  <- o .: "push"
-    return $ if admin then Admin
-              else if push then Push
-              else Pull
+    return $ bool (bool Pull Push push) Admin admin
   parseJSON _ = mzero
+instance ToJSON Permission where
+  toJSON p = String (fromString (show p))
 
 instance FromJSON Repository where
   parseJSON (Object o) =
