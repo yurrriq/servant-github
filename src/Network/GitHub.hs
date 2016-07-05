@@ -31,6 +31,7 @@ module Network.GitHub
     , teamRepositories
     , user
     , userRepositories
+    , userStars
     , getCommit
     , getContent
     , getIssues
@@ -91,6 +92,11 @@ user = github (Proxy :: Proxy GetUser)
 -- | Get repositories for the authorised user
 userRepositories :: Maybe String -> GitHub [Repository]
 userRepositories = github (Proxy :: Proxy UserRepositories)
+--
+-- | Get repositories starred by the authorised user
+-- userStars :: Maybe String -> Maybe String -> GitHub [Star]
+userStars :: GitHub [Star]
+userStars = github (Proxy :: Proxy UserStars)
 
 -- | Get commit for repo and reference
 getCommit :: OrgLogin -> RepoName -> Sha -> GitHub Commit

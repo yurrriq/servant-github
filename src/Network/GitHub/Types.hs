@@ -21,6 +21,7 @@ module Network.GitHub.Types
     , MemberId
     , Repository(..)
     , RepositoryName
+    , Star(..)
     , User(..)
     , RepoName -- short version
     , Sha
@@ -122,6 +123,34 @@ instance FromJSON Repository where
               <*> o .:? "default_branch"
               <*> o .: "private"
               <*> o .:? "permissions"
+  parseJSON _ = mzero
+
+-- | Star
+data Star = Star
+    { starId            :: Int
+    , starName          :: RepositoryName
+    , starDescription   :: Maybe Text
+    , starDefaultBranch :: Maybe Text
+    , starPrivate       :: Bool
+    , starPermissions   :: Maybe Permission
+    , starPushed        :: Maybe UTCTime
+    , starCreated       :: Maybe UTCTime
+    , starUpdated       :: Maybe UTCTime
+    -- TODO: starred_at
+    -- https://developer.github.com/v3/activity/starring/#alternative-response-with-star-creation-timestamps-1
+    } deriving (Eq, Show)
+
+instance FromJSON Star where
+  parseJSON (Object o) =
+   Star <$> o .:  "id"
+        <*> o .:  "full_name"
+        <*> o .:? "description"
+        <*> o .:? "default_branch"
+        <*> o .:  "private"
+        <*> o .:? "permissions"
+        <*> o .:  "pushed_at"
+        <*> o .:  "created_at"
+        <*> o .:  "updated_at"
   parseJSON _ = mzero
 
 -- | Organisation

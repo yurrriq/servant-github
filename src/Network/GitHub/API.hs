@@ -35,6 +35,12 @@ type GetUser = "user" :> Get '[JSON] User
 -- | <https://developer.github.com/v3/repos/#list-your-repositories>
 type UserRepositories = "user" :> "repos" :> QueryParam "type" String :> Get '[JSON] [Repository]
 
+-- | <https://developer.github.com/v3/activity/starring/#list-repositories-being-starred>
+type UserStars
+    = "user" :> "starred"
+    -- :> QueryParam "sort" String :> QueryParam "direction" String
+    :> Get '[JSON] [Star]
+
 -- | <https://developer.github.com/v3/repos/commits/#get-a-single-commit>
 type GetCommit
     = "repos" :> Capture "org" OrgLogin :> Capture "repo" RepoName
