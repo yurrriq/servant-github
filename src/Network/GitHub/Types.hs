@@ -153,6 +153,20 @@ instance FromJSON Star where
         <*> o .:  "updated_at"
   parseJSON _ = mzero
 
+instance ToJSON Star where
+  toJSON s =
+    object [ "id"             .= starId s
+           , "name"           .= starName s
+           , "decsription"    .= starDescription s
+           , "default_branch" .= starDefaultBranch s
+           , "private"        .= starPrivate s
+           -- TODO: starPermissions
+           -- TODO: starPushed
+           -- TODO: starCreated
+           -- TODO: starUpdated
+           -- TODO: starStarredAt
+           ]
+
 -- | Organisation
 data User = User
     { userLogin   :: Text
