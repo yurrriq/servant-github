@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 -- |
 -- Module      : Network.GitHub.Types
@@ -9,7 +9,7 @@
 --
 -- Most of the types only parse part of the data availble in the return
 -- values from the GitHub API. These will be added to as required.
- 
+
 module Network.GitHub.Types
     ( Organisation(..)
     , OrgLogin
@@ -32,18 +32,18 @@ module Network.GitHub.Types
     )
 where
 
-import Control.Monad
-import GHC.Generics
+import           Control.Monad
+import           GHC.Generics
 
-import Data.Aeson
-import Data.Text
-import Data.Time
+import           Data.Aeson
+import           Data.Text
+import           Data.Time
 
--- | Organisation 
-data Organisation = Organisation 
-    { orgLogin        :: OrgLogin
-    , orgId           :: Int
-    , orgDescription  :: Maybe Text
+-- | Organisation
+data Organisation = Organisation
+    { orgLogin       :: OrgLogin
+    , orgId          :: Int
+    , orgDescription :: Maybe Text
     } deriving (Eq, Show)
 -- | Primary identifier for an organisation is the login
 type OrgLogin = Text
@@ -78,8 +78,8 @@ instance FromJSON Team where
 
 -- | Member
 data Member = Member
-    { memberId        :: MemberId
-    , memberLogin     :: Text
+    { memberId    :: MemberId
+    , memberLogin :: Text
     } deriving (Eq, Show)
 -- | members are identified by ids
 type MemberId = Integer
@@ -92,11 +92,11 @@ instance FromJSON Member where
 
 -- | Repository
 data Repository = Repository
-    { repositoryName  :: RepositoryName
-    , repositoryDescription :: Maybe Text
+    { repositoryName          :: RepositoryName
+    , repositoryDescription   :: Maybe Text
     , repositoryDefaultBranch :: Maybe Text
-    , repositoryPrivate :: Bool
-    , repositoryPermissions :: Maybe Permission
+    , repositoryPrivate       :: Bool
+    , repositoryPermissions   :: Maybe Permission
     } deriving (Eq, Show)
 -- | repositories are identified by their name
 type RepositoryName = Text
@@ -107,7 +107,7 @@ instance Show Permission where
     show Pull  = "pull"
     show Admin = "admin"
 instance FromJSON Permission where
-  parseJSON (Object o) = do 
+  parseJSON (Object o) = do
     admin <- o .: "admin"
     push  <- o .: "push"
     return $ if admin then Admin
@@ -124,13 +124,13 @@ instance FromJSON Repository where
               <*> o .:? "permissions"
   parseJSON _ = mzero
 
--- | Organisation 
+-- | Organisation
 data User = User
-    { userLogin       :: Text
-    , userId          :: Int
-    , userName        :: Maybe Text
-    , userCompany     :: Maybe Text
-    , userEmail       :: Maybe Text
+    { userLogin   :: Text
+    , userId      :: Int
+    , userName    :: Maybe Text
+    , userCompany :: Maybe Text
+    , userEmail   :: Maybe Text
     } deriving (Eq, Show)
 
 instance FromJSON User where
@@ -143,7 +143,7 @@ instance FromJSON User where
   parseJSON _ = mzero
 
 instance ToJSON User where
-  toJSON u = 
+  toJSON u =
     object [ "login"   .= userLogin u
            , "id"      .= userId u
            , "name"    .= userName u
@@ -155,8 +155,8 @@ instance ToJSON User where
 type RepoName = Text
 type Sha = Text
 data Commit = Commit
-    { commitMessage     :: Text
-    , commitUrl         :: Text
+    { commitMessage :: Text
+    , commitUrl     :: Text
     } deriving (Eq, Show)
 
 -- TODO: fix this instance
@@ -169,7 +169,7 @@ instance FromJSON Commit where
   parseJSON _ = mzero
 
 instance ToJSON Commit where
-  toJSON c = 
+  toJSON c =
     let head_commit = object [ "message" .= commitMessage c
                              , "url"     .= commitUrl c ]
     in object [ "commits"     .= toJSON [ head_commit ]
@@ -202,31 +202,31 @@ instance FromJSON UserLogin where
     parseJSON _ = mzero
 
 data Milestone = Milestone
-    { milestoneNumber        :: Int
-    , milestoneState         :: Text
-    , milestoneTitle         :: Text
-    , milestoneDescripiton   :: Maybe Text
-    , milestoneCreator       :: UserLogin
-    , milestoneOpenIssues    :: Int
-    , milestoneClosedIssues  :: Int
-    , milestoneCreated       :: UTCTime
-    , milestoneUpdated       :: Maybe UTCTime
-    , milestoneClosed        :: Maybe UTCTime
-    , milestoneDueOn         :: Maybe UTCTime
+    { milestoneNumber       :: Int
+    , milestoneState        :: Text
+    , milestoneTitle        :: Text
+    , milestoneDescripiton  :: Maybe Text
+    , milestoneCreator      :: UserLogin
+    , milestoneOpenIssues   :: Int
+    , milestoneClosedIssues :: Int
+    , milestoneCreated      :: UTCTime
+    , milestoneUpdated      :: Maybe UTCTime
+    , milestoneClosed       :: Maybe UTCTime
+    , milestoneDueOn        :: Maybe UTCTime
     } deriving (Show, Eq)
 instance FromJSON Milestone where
     parseJSON (Object o) =
         Milestone <$> o .: "number"
-                  <*> o .: "state" 
-                  <*> o .: "title" 
-                  <*> o .:? "description" 
-                  <*> o .: "creator" 
-                  <*> o .: "open_issues" 
-                  <*> o .: "closed_issues" 
-                  <*> o .: "created_at" 
-                  <*> o .: "updated_at" 
-                  <*> o .: "closed_at" 
-                  <*> o .: "due_on" 
+                  <*> o .: "state"
+                  <*> o .: "title"
+                  <*> o .:? "description"
+                  <*> o .: "creator"
+                  <*> o .: "open_issues"
+                  <*> o .: "closed_issues"
+                  <*> o .: "created_at"
+                  <*> o .: "updated_at"
+                  <*> o .: "closed_at"
+                  <*> o .: "due_on"
     parseJSON _ = mzero
 
 newtype Label = Label Text deriving (Eq, Show)
@@ -237,20 +237,20 @@ instance FromJSON Label where
 
 -- | Issue
 data Issue = Issue
-    { issueNumber     :: Int
-    , issueUrl        :: Text
-    , issueState      :: Text
-    , issueTitle      :: Text
-    , issueBody       :: Text
-    , issueUser       :: UserLogin
-    , issueAssignee   :: Maybe UserLogin
-    , issueMilestone  :: Maybe Milestone
-    , issueLabels     :: [Label]
-    , issueLocked     :: Bool
-    , issueComments   :: Int
-    , issueCreated    :: UTCTime
-    , issueUpdated    :: UTCTime
-    , issueClosed     :: Maybe UTCTime
+    { issueNumber    :: Int
+    , issueUrl       :: Text
+    , issueState     :: Text
+    , issueTitle     :: Text
+    , issueBody      :: Text
+    , issueUser      :: UserLogin
+    , issueAssignee  :: Maybe UserLogin
+    , issueMilestone :: Maybe Milestone
+    , issueLabels    :: [Label]
+    , issueLocked    :: Bool
+    , issueComments  :: Int
+    , issueCreated   :: UTCTime
+    , issueUpdated   :: UTCTime
+    , issueClosed    :: Maybe UTCTime
     } deriving (Generic, Eq, Show)
 
 instance FromJSON Issue where
@@ -270,4 +270,3 @@ instance FromJSON Issue where
                 <*> o .: "updated_at"
                 <*> o .: "closed_at"
     parseJSON _ = mzero
-

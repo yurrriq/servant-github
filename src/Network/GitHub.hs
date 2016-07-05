@@ -1,27 +1,27 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE TypeOperators     #-}
 -- |
 -- Module      : Network.GitHub
 -- Copyright   : (c) Finlay Thompson, 2015
 -- License     : BSD3
 -- Maintainer  : finlay.thompson@gmail.com
 -- Stability   : experimental
--- 
+--
 -- The GitHub monad provides support for:
--- 
+--
 --     - Managing the authentication token. It can be Nothing, in which case
 --       no Authentication header is sent to the API,
--- 
+--
 --     - Setting the User-agent header string. This defaults to "servant-github",
 --       but can be set inside the GitHub monad using the 'setUserAgent', and
--- 
---     - Keeping track of the pagination in the case of calls that return lists 
+--
+--     - Keeping track of the pagination in the case of calls that return lists
 --       of objects.
 
-module Network.GitHub 
-    ( 
+module Network.GitHub
+    (
     -- * GitHub API calls
     -- $client
       userOrganisations
@@ -52,15 +52,15 @@ module Network.GitHub
     )
 where
 
-import Data.Proxy
+import           Data.Proxy
 
-import Network.GitHub.API
-import Network.GitHub.Types
-import Network.GitHub.Client
+import           Network.GitHub.API
+import           Network.GitHub.Client
+import           Network.GitHub.Types
 
 -- $client
 --
--- Functions that directly access the GitHub API. These functions all run 
+-- Functions that directly access the GitHub API. These functions all run
 -- in the 'GitHub' monad.
 --
 
@@ -101,10 +101,10 @@ getContent :: OrgLogin -> RepoName -> String -> Maybe String -> Maybe String -> 
 getContent = github (Proxy :: Proxy GetContent)
 
 -- | Get issuers for a repository
-type GHOptions =[(String, String)] 
+type GHOptions =[(String, String)]
 getIssues :: GHOptions -> Owner -> RepoName -> GitHub [Issue]
-getIssues opts owner repo 
-  = github (Proxy :: Proxy GetIssues) owner repo 
+getIssues opts owner repo
+  = github (Proxy :: Proxy GetIssues) owner repo
             (lookup "milestone" opts)
             (lookup "state" opts)
             (lookup "assignee" opts)
