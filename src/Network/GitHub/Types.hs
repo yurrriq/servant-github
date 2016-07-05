@@ -154,15 +154,8 @@ instance ToJSON Repository where
 
 -- | Star
 data Star = Star
-    { starId            :: Int
-    , starName          :: RepositoryName
-    , starDescription   :: Maybe Text
-    , starDefaultBranch :: Maybe Text
-    , starPrivate       :: Bool
-    , starPermissions   :: Maybe Permission
-    , starPushed        :: Maybe UTCTime
-    , starCreated       :: Maybe UTCTime
-    , starUpdated       :: Maybe UTCTime
+    { starId         :: Int
+    , starRepository :: Repository
     -- TODO: starred_at
     -- https://developer.github.com/v3/activity/starring/#alternative-response-with-star-creation-timestamps-1
     } deriving (Eq, Show)
@@ -170,29 +163,13 @@ data Star = Star
 instance FromJSON Star where
   parseJSON (Object o) =
    Star <$> o .:  "id"
-        <*> o .:  "full_name"
-        <*> o .:? "description"
-        <*> o .:? "default_branch"
-        <*> o .:  "private"
-        <*> o .:? "permissions"
-        <*> o .:  "pushed_at"
-        <*> o .:  "created_at"
-        <*> o .:  "updated_at"
+        <*> parseJSON (Object o)
   parseJSON _ = mzero
 
 instance ToJSON Star where
-  toJSON s =
-    object [ "id"             .= starId s
-           , "name"           .= starName s
-           , "decsription"    .= starDescription s
-           , "default_branch" .= starDefaultBranch s
-           , "private"        .= starPrivate s
-           -- TODO: starPermissions
-           -- TODO: starPushed
-           -- TODO: starCreated
-           -- TODO: starUpdated
-           -- TODO: starStarredAt
-           ]
+  toJSON (Star id repo) = setId (toJSON repo)
+    where setId (Object o) = object $ "id" .= id : HM.toList o
+    -- TODO: starStarredAt
 
 -- | Organisation
 data User = User
